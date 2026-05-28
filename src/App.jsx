@@ -641,6 +641,8 @@ const INVENTORY = [
 
 // Replace this with your actual referral link
 const REFERRAL_LINK = "https://app.gwalletnodes.net/referral/1015718";
+const GTX_BUY_LINK = "https://app.gwalletnodes.net/referral/1015718";
+const LAUNCH_DATE = new Date("2026-08-24T00:00:00Z");
 
 function SectionLabel({ text }) {
   return (
@@ -667,17 +669,19 @@ function Nav() {
       </div>
       {!mobile && (
         <div style={styles.navLinks}>
-          {["#process", "#tiers", "#rewards", "#growth"].map((href, i) => (
-            <a
-              key={i}
-              href={href}
-              style={styles.navLink}
-              onMouseEnter={(e) => (e.target.style.color = "var(--white)")}
-              onMouseLeave={(e) => (e.target.style.color = "var(--muted)")}
-            >
-              {["Process", "Node Tiers", "Rewards", "Growth"][i]}
-            </a>
-          ))}
+          {["#process", "#tiers", "#rewards", "#gtx", "#growth"].map(
+            (href, i) => (
+              <a
+                key={i}
+                href={href}
+                style={styles.navLink}
+                onMouseEnter={(e) => (e.target.style.color = "var(--white)")}
+                onMouseLeave={(e) => (e.target.style.color = "var(--muted)")}
+              >
+                {["Process", "Node Tiers", "Rewards", "GTX Token", "Growth"][i]}
+              </a>
+            ),
+          )}
         </div>
       )}
       <button
@@ -1068,6 +1072,272 @@ function Urgency() {
   );
 }
 
+function useCountdown(targetDate) {
+  const [timeLeft, setTimeLeft] = useState({});
+
+  useEffect(() => {
+    const calc = () => {
+      const diff = targetDate - new Date();
+      if (diff <= 0)
+        return setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    calc();
+    const id = setInterval(calc, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+
+  return timeLeft;
+}
+
+function GTXToken() {
+  const { days, hours, minutes, seconds } = useCountdown(LAUNCH_DATE);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
+  useEffect(() => {
+    const h = () => setIsMobile(window.innerWidth < 900);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+
+  const pad = (n) => String(n ?? 0).padStart(2, "0");
+
+  const tokenStats = [
+    { label: "Price Round 1", value: "$0.00015" },
+    { label: "Minimum Purchase", value: "$50 USD" },
+    { label: "Maximum Purchase", value: "$20,000 USD" },
+    { label: "Total Supply", value: "100B GTX" },
+    { label: "Exchange Launch", value: "Aug 24, 2026" },
+    { label: "Pre-Sale Allocation", value: "5B GTX" },
+  ];
+
+  const commissions = [
+    { level: "Level 1", pct: "15%" },
+    { level: "Level 2", pct: "7.5%" },
+    { level: "Level 3", pct: "5%" },
+  ];
+
+  return (
+    <section style={styles.sectionAlt} id="gtx">
+      <div style={styles.labelRow}>
+        <span style={styles.labelDash} />
+        <span style={styles.sectionLabel}>GTX Token Pre-Sale</span>
+      </div>
+      <h2 style={styles.h2}>
+        Buy GTX Before
+        <br />
+        <span style={{ color: "var(--teal)" }}>Exchange Launch.</span>
+      </h2>
+      <p style={styles.secSub}>
+        GTX is the native utility token of the G-Wallet ecosystem. Earned
+        through participation, not speculation. The first round pre-sale is open
+        now.
+      </p>
+
+      {/* Countdown */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 12,
+          marginBottom: 56,
+          maxWidth: 600,
+        }}
+      >
+        {[
+          ["Days", pad(days)],
+          ["Hours", pad(hours)],
+          ["Minutes", pad(minutes)],
+          ["Seconds", pad(seconds)],
+        ].map(([label, val]) => (
+          <div
+            key={label}
+            style={{
+              background: "var(--bg)",
+              border: "1px solid rgba(0,200,188,0.2)",
+              borderRadius: 2,
+              padding: "24px 16px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: "2.8rem",
+                fontWeight: 900,
+                color: "var(--teal)",
+                lineHeight: 1,
+              }}
+            >
+              {val}
+            </div>
+            <div
+              style={{
+                fontSize: "0.65rem",
+                letterSpacing: "2px",
+                textTransform: "uppercase",
+                color: "var(--muted)",
+                marginTop: 8,
+              }}
+            >
+              {label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Stats + Commissions */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+          gap: 24,
+          marginBottom: 40,
+        }}
+      >
+        <div
+          style={{
+            background: "var(--bg)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 2,
+            padding: "32px 28px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              color: "var(--teal)",
+              marginBottom: 24,
+              fontWeight: 600,
+            }}
+          >
+            Token Details
+          </div>
+          {tokenStats.map(({ label, value }, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "12px 0",
+                borderBottom:
+                  i < tokenStats.length - 1
+                    ? "1px solid rgba(255,255,255,0.06)"
+                    : "none",
+              }}
+            >
+              <span style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
+                {label}
+              </span>
+              <span
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  color: "var(--lime)",
+                }}
+              >
+                {value}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            background: "var(--bg)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 2,
+            padding: "32px 28px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              color: "var(--teal)",
+              marginBottom: 24,
+              fontWeight: 600,
+            }}
+          >
+            Affiliate Commission Structure
+          </div>
+          {commissions.map(({ level, pct }, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "16px 20px",
+                marginBottom: 12,
+                background: "var(--bg3)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 2,
+              }}
+            >
+              <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
+                {level}
+              </span>
+              <span
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: "1.4rem",
+                  fontWeight: 900,
+                  color: "var(--teal)",
+                }}
+              >
+                {pct}
+              </span>
+            </div>
+          ))}
+          <div
+            style={{
+              marginTop: 8,
+              padding: "14px 16px",
+              background: "rgba(0,200,188,0.05)",
+              border: "1px solid rgba(0,200,188,0.15)",
+              borderRadius: 2,
+            }}
+          >
+            <p
+              style={{
+                fontSize: "0.78rem",
+                color: "var(--muted)",
+                lineHeight: 1.6,
+              }}
+            >
+              Commissions paid immediately in USDT upon purchase. No waiting
+              period.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <a
+        href={GTX_BUY_LINK}
+        target="_blank"
+        rel="noreferrer"
+        style={styles.btnPrimary}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.background = "var(--teal2)")
+        }
+        onMouseLeave={(e) => (e.currentTarget.style.background = "var(--teal)")}
+      >
+        Buy GTX Tokens →
+      </a>
+    </section>
+  );
+}
+
 function CTA() {
   return (
     <section style={styles.ctaBlock} id="cta">
@@ -1090,6 +1360,7 @@ function CTA() {
         <a
           href={REFERRAL_LINK}
           target="_blank"
+          rel="noreferrer"
           style={{
             ...styles.btnPrimary,
             fontSize: "1rem",
@@ -1102,20 +1373,27 @@ function CTA() {
             (e.currentTarget.style.background = "var(--teal)")
           }
         >
-          Secure Your G-Wallet Node →
+          Secure Your Node →
         </a>
         <a
-          href="https://app.gwalletnodes.net/"
+          href={GTX_BUY_LINK}
           target="_blank"
-          style={{ ...styles.btnGhost, fontSize: "1rem", padding: "16px 32px" }}
+          rel="noreferrer"
+          style={{
+            ...styles.btnGhost,
+            fontSize: "1rem",
+            padding: "16px 32px",
+            borderColor: "rgba(0,200,188,0.3)",
+            color: "var(--teal)",
+          }}
           onMouseEnter={(e) =>
-            (e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)")
+            (e.currentTarget.style.borderColor = "var(--teal)")
           }
           onMouseLeave={(e) =>
-            (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")
+            (e.currentTarget.style.borderColor = "rgba(0,200,188,0.3)")
           }
         >
-          Visit Platform
+          Buy GTX Tokens →
         </a>
       </div>
     </section>
@@ -1146,6 +1424,7 @@ export default function App() {
       <NodeTiers />
       <Rewards />
       <Growth />
+      <GTXToken />
       <Urgency />
       <CTA />
       <Footer />
